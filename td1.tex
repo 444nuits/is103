@@ -1,0 +1,80 @@
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\graphicspath{{./img/}}
+\usepackage{amsmath, amssymb}
+\usepackage[left=3cm,right=3cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{url}
+\usepackage{amsmath, amssymb}
+\usepackage{minted}
+
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator{\myfunc}{myfunc}
+\DeclareMathOperator*{\sign}{sign}
+\DeclareMathOperator*{\imwh}{width}
+\DeclareMathOperator*{\imht}{height}
+\newtheorem{defi}{Définition}
+
+
+
+\begin{document}
+
+\begin{center}
+  \begin{tabular}{|c|}
+    \hline
+    TP n°1 : Entropies discrète et continue, information mutuelle\\
+    \hline
+  \end{tabular} 
+\end{center}
+\section{Lien entre entropie discrète et continue}
+  \begin{enumerate}
+  \item  $F_{X}=P(X\leq x)$ continue sur$ [i\Delta ; (i+1)\Delta] $ de dérivé $f_{x}  $  on applique le TAF(theoreme des accroissements finis)
+
+    on dispose alors de $x_{i} \in [i\Delta ; (i+1)\Delta]$ tel que :
+    $ F_{X}((i+1)\Delta)-F_{X}(i\Delta)=f_{X}(x_{i})\Delta$\\
+    par ailleurs :  $ F_{X}((i+1)\Delta)-F_{X}(i\Delta) =  \int_{i\Delta}^{(i+1)\Delta}f_{X}(x)dx$\\
+    en r'emplacant dans la formule on a : $ \int_{i\Delta}^{(i+1)\Delta}f_{X}(x)dx = f_{X}(x_{i})\Delta$ \\
+  D'où le resultat.\\
+    
+    
+  \item la variable discrète $X_{\Delta}$ suit la  loi $\Delta f_{X}(x_{i})$\\ car $\forall i \in \mathbb{Z}$  , $ P(x_{\Delta} = x_{i}) = P(X\leq (i+1)\Delta) - P(X \leq i\Delta)= \int_{i\Delta}^{(i+1)\Delta}f_{X}(x)dx = \Delta f_{X}(x_{i}) $\\
+
+
+  \item  En appliquant la formule de l'entropie on en déduit que:\\ \\ $H(X_{\Delta}) =- \sum_{i \in \mathbb{Z}}f_{X}(x_{i})\Delta log(\Delta f_{X}(x_{i})$ \\ \\$ = -\Delta \sum_{i \in \mathbb{Z}}f_{X}(x_{i})(log(\Delta) +$  $ log(f_{X}(x_{i})) = -\Delta \sum_{i \in \mathbb{Z}}f_{X}(x_{i})log(f_{X}(x_{i})$  $ - log(\Delta)\sum_{i \in \mathbb{Z}}\Delta f_{X}(x_{i})$\\ \\ $ or   \sum_{i \in \mathbb{Z}} \Delta f_{X}(x_{i}) = \int_{i\Delta}^{(i+1)\Delta}f_{X}(x)dx= 1 $ car f(x) est une densité . \\ \\
+D'où le resultat  $H(X_{\Delta}) = -\Delta \sum_{i \in \mathbb{Z}}f_{X}(x_{i})log(f_{X}(x_{i}) - log(\Delta)$\\
+
+
+
+
+
+\item On en déduit que lorsque $\Delta\to 0 $ on a $H(X_{\Delta})+ \log(\Delta) = -\Delta \sum_{i \in \mathbb{Z}} f_{X}(x_{i})log(f_{X}(x_{i}))$ ce qui tend vers $  - \int_{-\infty}^{\infty}f_{X}(x)log(f_{X}(x))dx = H(X)$ quand $\Delta\to 0$  car les intervales $[i\Delta;(i+1)\Delta]$ tendent à partitier entierement $ \mathbb{Z} $ .\\
+  \\
+  \\
+    On observe alors que en prenant des intervales très petits l'entropie discrète s'approche de l'entropie  continue .\\
+Ainsi pour approcher l'entropie continue on va prendre  des intervales les plus petits possibles et utiliser l'entropie discrète.
+
+   \end{enumerate} 
+
+\section{Loi Gaussienne}
+\begin{enumerate}
+  \item question 1 :
+
+    On utilise d'abord pour se faire la propriété suivante, 
+    soit $X$ suit une loi normale de moyenne $\mu$ and d'écart type $\sigma$: $X \sim \mathcal{N}(\mu,\,\sigma^{2})$
+    alors $ \sigma X + \mu \sim \mathcal{N}(0, 1)$
+
+    on peut alors modeliser, $n = 10000$ réalisations de $X$ de la maniere suivante, en utilisant 
+    \begin{minted}{python}
+      import numpy as np
+      import math as m
+      def Gaussienne(mu, sigma):
+          x=[]
+          for i in range(0, 10000):
+              x.append((m.sqrt(sigma) * np.random.randn()) + mu)
+          return x
+    \end{minted}
+
+\end{enumerate}
+
+\end{document}
