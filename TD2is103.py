@@ -5,8 +5,9 @@ Created on Wed Dec  8 13:56:28 2021
 
 @author: brieuc
 """
-
-import binarytree as bt
+import PIL as pil
+#import binarytree as bt
+import numpy as np
 
 class Node:
     def __init__(self, l=None, r=None, i=0, p=0):
@@ -134,6 +135,8 @@ def huffman_code(proba):
         s+= (len(cwd[i]) * L[i])
     return cwd, s/l
 
+#algorithmes necessitant le module "binarytree" permettant d'afficher des arbres
+"""
 def build_tree_rec(root, node):
     if(node.right != None):
         root.right = bt.Node(node.right.prob)
@@ -150,6 +153,8 @@ def prettyprint(tree):
     build_tree_rec(root, tree)
     print(root)
     
+"""
+
 def calcullmax(cwd):
     res=0
     for i in range(len(cwd)):
@@ -211,12 +216,12 @@ def huffman_decode(seq, symb, cwd):
     cidx = 0
     Lsymb = []
     lseq = len(seq)
-    while(cidx<lseq-2):
+    while(cidx<lseq):
         word = cwd_detect(tree, seq[cidx :])
         cidx += len(word)
         Lsymb.append(get_symb(word, cwd, symb))
-    msg = build_string(Lsymb)
-    return msg
+    #msg = build_string(Lsymb)
+    return Lsymb
 
 def is_in(char, symb):
     l = len(symb)
@@ -258,6 +263,7 @@ def get_index(letter, symb):
     for i in range(0, lsymb):
         if(letter == symb[i]):
             return i
+    print(letter)
     print("lettre pas dans symbole")
     return False
 
@@ -265,12 +271,11 @@ def huffman_encode(seq, symb, cwd):
     lseq = len(seq)
     encseq = ""
     for i in range(0, lseq):
-        i = get_index(seq[i], symb)
-        add = '' + cwd[i]
-        encseq += add
+        idx = get_index(seq[i], symb)
+        encseq += cwd[idx]
     return encseq
 
-seq = "Bonjour le monde j'ai reussi a compresser puis decompresser avec la methode de huffman je suis tres content !"
+seq = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 symb = get_symb_list(seq)
 proba = get_probas(seq, symb)
 
@@ -288,4 +293,53 @@ print()
 print("le mot de code est :", cwd)
 print()
 print("on peut decoder le message et le restituer", huffman_decode(encseq, symb, cwd))
+print()
+#--------------------------------------------------------#
+
+img = list(pil.Image.open('./moon.png').getdata())
+
+histo = np.histogram(img, bins=256)
+histo2 = np.histogram(img, bins=255)
+
+def count(histo):
+    s=0
+    l=len(histo)
+    for i in range(0, l):
+        s+=histo[i]
+    return s
+
+pxlcount = count(histo[0])
+
+clrproba = histo[0]/pxlcount
+
+def get_round(histo):
+    l = len(histo)
+    L=[]
+    for i in range(0, l):
+        L.append(round(histo[i]))
+    return L
+
+clrsymb = get_round(histo2[1])
+
+clrcwd = get_cwd(huffman_tree(clrproba))
+print("encodage...")
+new_image_enc = huffman_encode(img, clrsymb, clrcwd)
+print("decodage...")
+new_image = huffman_decode(new_image_enc, clrsymb, clrcwd)
+print("fin")
+
+def build_array(width, height, img):
+    IMG = [[0 for i in range(0, width)] for i in range(0, height)]
+    for i in range(0, height):
+        for k in range(0, width):
+            IMG[i][k] = img[i*width + k]
+    return IMG
+
+new_image_array = build_array(726, 543, new_image)
+
+new_image_toshow = pil.Image.fromarray(np.array(new_image_array, dtype=np.uint8))
+new_image_toshow.save("mymoon.png")
+
+print("sequence encodée dans new_image_enc ")
+print("fichier décodé dans mymoon.png")
 
