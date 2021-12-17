@@ -8,6 +8,8 @@ Created on Wed Dec  8 13:56:28 2021
 import PIL as pil
 #import binarytree as bt
 import numpy as np
+import matplotlib.pyplot as plt
+import math as m
 
 class Node:
     def __init__(self, l=None, r=None, i=0, p=0):
@@ -133,7 +135,7 @@ def huffman_code(proba):
     s = 0
     for i in range(0, l):
         s+= (len(cwd[i]) * L[i])
-    return cwd, s/l
+    return cwd, s
 
 #algorithmes necessitant le module "binarytree" permettant d'afficher des arbres
 """
@@ -211,17 +213,23 @@ def build_string(charL):
         msg += charL[i]
     return msg
 
-def huffman_decode(seq, symb, cwd):
+def huffman_decode(seq, symb, cwd, size):
     tree = huffman_tree2(cwd)
     cidx = 0
-    Lsymb = []
+    idx=0
+    print("avant")
+    tab = [0 for i in range(0, size)]
+    print("apres")
     lseq = len(seq)
+    print("c'est bien cette boucle")
     while(cidx<lseq):
         word = cwd_detect(tree, seq[cidx :])
         cidx += len(word)
-        Lsymb.append(get_symb(word, cwd, symb))
+        tab[idx] = get_symb(word, cwd, symb)
+        idx+=1
+    print("qui prend le plus de temps")
     #msg = build_string(Lsymb)
-    return Lsymb
+    return tab
 
 def is_in(char, symb):
     l = len(symb)
@@ -292,13 +300,13 @@ print(proba)
 print()
 print("le mot de code est :", cwd)
 print()
-print("on peut decoder le message et le restituer", huffman_decode(encseq, symb, cwd))
+print("on peut decoder le message et le restituer", huffman_decode(encseq, symb, cwd, len(seq)))
 print()
 #--------------------------------------------------------#
 
 img = list(pil.Image.open('./moon.png').getdata())
 
-histo = np.histogram(img, bins=256)
+histo = np.histogram(img, bins=256, range = (0, 256))
 histo2 = np.histogram(img, bins=255)
 
 def count(histo):
@@ -319,13 +327,13 @@ def get_round(histo):
         L.append(round(histo[i]))
     return L
 
-clrsymb = get_round(histo2[1])
+clrsymb = get_round(histo[1][:-1])
 
 clrcwd = get_cwd(huffman_tree(clrproba))
-print("encodage...")
+print("encodage moon...")
 new_image_enc = huffman_encode(img, clrsymb, clrcwd)
-print("decodage...")
-new_image = huffman_decode(new_image_enc, clrsymb, clrcwd)
+print("decodage moon...")
+new_image = huffman_decode(new_image_enc, clrsymb, clrcwd, len(img))
 print("fin")
 
 def build_array(width, height, img):
@@ -342,4 +350,97 @@ new_image_toshow.save("mymoon.png")
 
 print("sequence encodée dans new_image_enc ")
 print("fichier décodé dans mymoon.png")
+
+def build_histo(histo):
+    x = histo[1][:-1]
+    y = histo[0]
+    plt.plot(x, y)
+    plt.show
+    
+plt.yscale('log')
+    
+build_histo(histo)
+
+def calc_entropie(histo):
+    s=0
+    n = len(histo)
+    for i in range(0, n):
+        if(histo[i] > 0):
+            s+= histo[i]*m.log10(histo[i])
+    return -s
+
+entropie = calc_entropie(histo[0]/pxlcount)
+
+#-----------------_--------------------------------------#
+
+imgboat = list(pil.Image.open('./boat.png').getdata())
+
+histoboat = np.histogram(imgboat, bins=256, range = (0, 256))
+
+pxlboatcount = count(histoboat[0])
+
+boatproba = histoboat[0]/pxlboatcount
+
+boatsymb = get_round(histoboat[1][:-1])
+
+boatcwd = get_cwd(huffman_tree(boatproba))
+print("encodage boat...")
+new_boat_enc = huffman_encode(imgboat, boatsymb, boatcwd)
+print("decodage boat...")
+new_boat = huffman_decode(new_boat_enc, boatsymb, boatcwd, len(imgboat))
+print("fin")
+
+
+
+new_boat_array = build_array(512, 512, new_boat)
+
+new_boat_toshow = pil.Image.fromarray(np.array(new_boat_array, dtype=np.uint8))
+new_boat_toshow.save("myboat.png")
+
+print("sequence encodée dans new_boat_enc ")
+print("fichier décodé dans myboat.png")
+
+    
+build_histo(histoboat)
+
+entropieboat = calc_entropie(histoboat[0]/pxlcount)
+
+#-----------------_--------------------------------------#
+
+imghill = list(pil.Image.open('./goldhill.png').getdata())
+
+histohill = np.histogram(imghill, bins=256, range = (0, 256))
+
+pxlhillcount = count(histohill[0])
+
+hillproba = histohill[0]/pxlhillcount
+
+hillsymb = get_round(histohill[1][:-1])
+
+hillcwd = get_cwd(huffman_tree(hillproba))
+print("encodage hill...")
+new_hill_enc = huffman_encode(imghill, hillsymb, hillcwd)
+print("decodage hill...")
+new_hill = huffman_decode(new_hill_enc, hillsymb, hillcwd, len(imghill))
+print("fin")
+
+
+
+new_hill_array = build_array(512, 512, new_hill)
+
+new_hill_toshow = pil.Image.fromarray(np.array(new_hill_array, dtype=np.uint8))
+new_hill_toshow.save("myhill.png")
+
+print("sequence encodée dans new_hill_enc ")
+print("fichier décodé dans myhill.png")
+
+    
+build_histo(histohill)
+
+entropiehill = calc_entropie(histohill[0]/pxlcount)
+
+
+
+
+
 
